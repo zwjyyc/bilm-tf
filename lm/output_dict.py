@@ -1,6 +1,9 @@
 
-import sys
 import pickle
+import sys
+
+
+from .vocab import Vocab
 
 with open(sys.argv[1], 'r') as fin:
     vocab = pickle.load(fin)
