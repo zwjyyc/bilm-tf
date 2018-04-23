@@ -1,7 +1,10 @@
 
 import pickle
 import sys
+import os
 
+reload(sys)
+sys.setdefaultencoding('utf8')
 from vocab import Vocab
 
 with open(sys.argv[1], 'r') as fin:
