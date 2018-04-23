@@ -10,4 +10,4 @@ with open(sys.argv[1], 'r') as fin:
 
     for token, id in token2ids.items():
         out_str = '{}\t{}'.format(token, id)
-        print(out_str.encode('utf-8'))
+        print(out_str)
