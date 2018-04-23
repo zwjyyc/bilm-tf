@@ -20,3 +20,4 @@ from __future__ import print_function
 
 import reader
 import util
+import vocab
