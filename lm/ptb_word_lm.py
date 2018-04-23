@@ -333,7 +333,7 @@ class MRCConfig(object):
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
-  vocab_size = 10000
+  vocab_size = 299372
   rnn_mode = BASIC
 
 
@@ -351,7 +351,7 @@ class TestConfig(object):
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
-  vocab_size = 10000
+  vocab_size = 299372
   rnn_mode = BASIC
 
 
