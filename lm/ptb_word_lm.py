@@ -74,7 +74,7 @@ flags = tf.flags
 logging = tf.logging
 
 flags.DEFINE_string(
-    "model", "small",
+    "model", "mrc",
     "A type of model. Possible options are: small, medium, large.")
 flags.DEFINE_string("data_path", None,
                     "Where the training/test data is stored.")
