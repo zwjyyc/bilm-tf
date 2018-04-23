@@ -52,7 +52,7 @@ $ tar xvf simple-examples.tgz
 
 To run:
 
-$ python ptb_word_lm.py --data_path=simple-examples/data/
+$ python ptb_word_lm.py --data_path=simple-examples/data/ --vocab_path=data/corpus/
 
 """
 from __future__ import absolute_import
@@ -87,7 +87,7 @@ flags.DEFINE_integer("num_gpus", 1,
                      "If larger than 1, Grappler AutoParallel optimizer "
                      "will create multiple training replicas with each GPU "
                      "running one replica.")
-flags.DEFINE_integer("gpu")
+flags.DEFINE_integer("gpu", 1)
 flags.DEFINE_string("rnn_mode", None,
                     "The low level implementation of lstm cell: one of CUDNN, "
                     "BASIC, and BLOCK, representing cudnn_lstm, basic_lstm, "
