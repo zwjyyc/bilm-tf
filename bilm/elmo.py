@@ -1,6 +1,7 @@
 
 import tensorflow as tf
 
+
 def weight_layers(name, bilm_ops, l2_coef=None,
                   use_top_only=False, do_layer_norm=False):
     '''
@@ -29,6 +30,7 @@ def weight_layers(name, bilm_ops, l2_coef=None,
             'regularization_op': op to compute regularization term
         }
     '''
+
     def _l2_regularizer(weights):
         if l2_coef is not None:
             return l2_coef * tf.reduce_sum(tf.square(weights))

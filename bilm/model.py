@@ -18,8 +18,7 @@ class BidirectionalLanguageModel(object):
             weight_file: str,
             use_character_inputs=True,
             embedding_weight_file=None,
-            max_batch_size=128,
-        ):
+            max_batch_size=128,):
         '''
         Creates the language model computational graph and loads weights
 
@@ -455,7 +454,6 @@ class BidirectionalLanguageModelGraph(object):
         # at last assign attributes for remainder of the model
         self.embedding = embedding
 
-
     def _build_word_embeddings(self):
         projection_dim = self.options['lstm']['projection_dim']
 
@@ -467,7 +465,6 @@ class BidirectionalLanguageModelGraph(object):
             )
             self.embedding = tf.nn.embedding_lookup(self.embedding_weights,
                                                 self.ids_placeholder)
-
 
     def _build_lstms(self):
         # now the LSTMs
@@ -635,6 +632,7 @@ def dump_token_embeddings(vocab_file, options_file, weight_file, outfile):
         ds = fout.create_dataset(
             'embedding', embeddings.shape, dtype='float32', data=embeddings
         )
+
 
 def dump_bilm_embeddings(vocab_file, dataset_file, options_file,
                          weight_file, outfile):

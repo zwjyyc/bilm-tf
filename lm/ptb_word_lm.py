@@ -59,6 +59,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import time
 
 import numpy as np
@@ -85,6 +86,7 @@ flags.DEFINE_integer("num_gpus", 1,
                      "If larger than 1, Grappler AutoParallel optimizer "
                      "will create multiple training replicas with each GPU "
                      "running one replica.")
+flags.DEFINE_integer("gpu")
 flags.DEFINE_string("rnn_mode", None,
                     "The low level implementation of lstm cell: one of CUDNN, "
                     "BASIC, and BLOCK, representing cudnn_lstm, basic_lstm, "
@@ -317,55 +319,22 @@ class PTBModel(object):
     return self._final_state_name
 
 
-class SmallConfig(object):
+class MRCConfig(object):
   """Small config."""
   init_scale = 0.1
   learning_rate = 1.0
   max_grad_norm = 5
   num_layers = 2
-  num_steps = 20
-  hidden_size = 200
+  num_steps = 150
+  hidden_size = 156
   max_epoch = 4
   max_max_epoch = 13
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
   vocab_size = 10000
-  rnn_mode = BLOCK
+  rnn_mode = BASIC
 
-
-class MediumConfig(object):
-  """Medium config."""
-  init_scale = 0.05
-  learning_rate = 1.0
-  max_grad_norm = 5
-  num_layers = 2
-  num_steps = 35
-  hidden_size = 650
-  max_epoch = 6
-  max_max_epoch = 39
-  keep_prob = 0.5
-  lr_decay = 0.8
-  batch_size = 20
-  vocab_size = 10000
-  rnn_mode = BLOCK
-
-
-class LargeConfig(object):
-  """Large config."""
-  init_scale = 0.04
-  learning_rate = 1.0
-  max_grad_norm = 10
-  num_layers = 2
-  num_steps = 35
-  hidden_size = 1500
-  max_epoch = 14
-  max_max_epoch = 55
-  keep_prob = 0.35
-  lr_decay = 1 / 1.15
-  batch_size = 20
-  vocab_size = 10000
-  rnn_mode = BLOCK
 
 
 class TestConfig(object):
@@ -382,7 +351,7 @@ class TestConfig(object):
   lr_decay = 0.5
   batch_size = 20
   vocab_size = 10000
-  rnn_mode = BLOCK
+  rnn_mode = BASIC
 
 
 def run_epoch(session, model, eval_op=None, verbose=False):
@@ -424,12 +393,8 @@ def run_epoch(session, model, eval_op=None, verbose=False):
 def get_config():
   """Get model config."""
   config = None
-  if FLAGS.model == "small":
-    config = SmallConfig()
-  elif FLAGS.model == "medium":
-    config = MediumConfig()
-  elif FLAGS.model == "large":
-    config = LargeConfig()
+  if FLAGS.model == "mrc":
+    config = MRCConfig()
   elif FLAGS.model == "test":
     config = TestConfig()
   else:
@@ -455,6 +420,9 @@ def main(_):
         "Your machine has only %d gpus "
         "which is less than the requested --num_gpus=%d."
         % (len(gpus), FLAGS.num_gpus))
+
+  os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+  os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
 
   raw_data = reader.ptb_raw_data(FLAGS.data_path)
   train_data, valid_data, test_data, _ = raw_data
