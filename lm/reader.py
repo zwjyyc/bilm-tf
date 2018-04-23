@@ -79,6 +79,7 @@ def ptb_raw_data(data_path=None, vocab_path=None):
   if vocab_path==None:
     word_to_id = _build_vocab(train_path)
   else:
+    print vocab_path
     word_to_id = load_vocab(vocab_path)
   print('load {} words'.format(len(word_to_id)))
   train_data = _file_to_word_ids(train_path, word_to_id)
