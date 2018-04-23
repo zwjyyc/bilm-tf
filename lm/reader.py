@@ -50,7 +50,7 @@ def _build_vocab(filename):
 
 def _file_to_word_ids(filename, word_to_id):
   data = _read_words(filename)
-  return [word_to_id.get(word, word_to_id['unk']) for word in data]
+  return [word_to_id.get(word, word_to_id['<unk>']) for word in data]
 
 
 def ptb_raw_data(data_path=None, vocab_path=None):
