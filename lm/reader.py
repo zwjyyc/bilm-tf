@@ -22,6 +22,7 @@ from __future__ import print_function
 import collections
 import os
 import sys
+import util
 
 import tensorflow as tf
 
@@ -30,9 +31,9 @@ Py3 = sys.version_info[0] == 3
 def _read_words(filename):
   with tf.gfile.GFile(filename, "r") as f:
     if Py3:
-      return f.read().replace("\n", "<eos>").split()
+      return f.read().replace("\n", "<blank>").split()
     else:
-      return f.read().decode("utf-8").replace("\n", "<eos>").split()
+      return f.read().decode("utf-8").replace("\n", "<blank>").split()
 
 
 def _build_vocab(filename):
@@ -49,7 +50,7 @@ def _build_vocab(filename):
 
 def _file_to_word_ids(filename, word_to_id):
   data = _read_words(filename)
-  return [word_to_id[word] for word in data if word in word_to_id]
+  return [word_to_id.get(word, word_to_id['unk']) for word in data]
 
 
 def ptb_raw_data(data_path=None):
@@ -71,11 +72,12 @@ def ptb_raw_data(data_path=None):
     where each of the data objects can be passed to PTBIterator.
   """
 
-  train_path = os.path.join(data_path, "ptb.train.txt")
-  valid_path = os.path.join(data_path, "ptb.valid.txt")
-  test_path = os.path.join(data_path, "ptb.test.txt")
+  train_path = os.path.join(data_path, "mrc.train.txt")
+  valid_path = os.path.join(data_path, "mrc.valid.txt")
+  test_path = os.path.join(data_path, "mrc.test.txt")
 
-  word_to_id = _build_vocab(train_path)
+  word_to_id = load_vocab(train_path)
+  print('load {} words'.format(len(word_to_id)))
   train_data = _file_to_word_ids(train_path, word_to_id)
   valid_data = _file_to_word_ids(valid_path, word_to_id)
   test_data = _file_to_word_ids(test_path, word_to_id)

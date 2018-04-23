@@ -17,10 +17,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
+import pickle
+import sys
 
+import tensorflow as tf
 from tensorflow.core.framework import variable_pb2
 from tensorflow.core.protobuf import rewriter_config_pb2
+from vocab import Vocab
 
 FLAGS = tf.flags.FLAGS
 
@@ -94,3 +97,9 @@ def auto_parallel(metagraph, model):
   optimized_graph = tf_optimizer.OptimizeGraph(rewriter_config, metagraph)
   metagraph.graph_def.CopyFrom(optimized_graph)
   UpdateCollection(metagraph, model)
+
+
+def load_vocab(vocab_file):
+  with open(vocab_file, 'r') as fin:
+    vocab = pickle.load(fin)
+    return vocab.token2id
