@@ -52,7 +52,7 @@ $ tar xvf simple-examples.tgz
 
 To run:
 
-$ python ptb_word_lm.py --data_path=data/corpus/ --vocab_path=data/corpus/
+$ python ptb_word_lm.py --data_path=data/corpus/ --vocab_path= ../../Baidu/data/vocab_cut10_true_newpl122gEmb/vocab.data
 
 """
 from __future__ import absolute_import
