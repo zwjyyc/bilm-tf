@@ -53,7 +53,7 @@ def _file_to_word_ids(filename, word_to_id):
   return [word_to_id.get(word, word_to_id['unk']) for word in data]
 
 
-def ptb_raw_data(data_path=None):
+def ptb_raw_data(data_path=None, vocab_path=None):
   """Load PTB raw data from data directory "data_path".
 
   Reads PTB text files, converts strings to integer ids,
@@ -76,7 +76,10 @@ def ptb_raw_data(data_path=None):
   valid_path = os.path.join(data_path, "mrc.valid.txt")
   test_path = os.path.join(data_path, "mrc.test.txt")
 
-  word_to_id = load_vocab(train_path)
+  if vocab_path==None
+    word_to_id = _build_vocab(train_path)
+  else:
+    word_to_id = load_vocab(vocab_path)
   print('load {} words'.format(len(word_to_id)))
   train_data = _file_to_word_ids(train_path, word_to_id)
   valid_data = _file_to_word_ids(valid_path, word_to_id)

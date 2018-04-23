@@ -52,7 +52,7 @@ $ tar xvf simple-examples.tgz
 
 To run:
 
-$ python ptb_word_lm.py --data_path=simple-examples/data/ --vocab_path=data/corpus/
+$ python ptb_word_lm.py --data_path=data/corpus/ --vocab_path=data/corpus/
 
 """
 from __future__ import absolute_import
@@ -425,7 +425,7 @@ def main(_):
   os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
   os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
 
-  raw_data = reader.ptb_raw_data(FLAGS.data_path)
+  raw_data = reader.ptb_raw_data(FLAGS.data_path, FLAGS.vocab_path)
   train_data, valid_data, test_data, _ = raw_data
 
   print('data load finished!')
