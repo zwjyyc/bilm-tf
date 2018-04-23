@@ -9,5 +9,5 @@ with open(sys.argv[1], 'r') as fin:
     token2ids = vocab.token2id
 
     for token, id in token2ids.items():
-        out_str = '{}\t{}'.format(token, id)
+        out_str = '{}\t{}'.format(token.decode('utf8'), id)
         print(out_str)
