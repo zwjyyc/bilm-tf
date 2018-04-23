@@ -76,7 +76,7 @@ def ptb_raw_data(data_path=None, vocab_path=None):
   valid_path = os.path.join(data_path, "mrc.valid.txt")
   test_path = os.path.join(data_path, "mrc.test.txt")
 
-  if vocab_path==None
+  if vocab_path==None:
     word_to_id = _build_vocab(train_path)
   else:
     word_to_id = load_vocab(vocab_path)
