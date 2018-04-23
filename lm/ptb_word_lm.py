@@ -428,7 +428,7 @@ def main(_):
   raw_data = reader.ptb_raw_data(FLAGS.data_path)
   train_data, valid_data, test_data, _ = raw_data
 
-  print('dataload finished!')  
+  print('data load finished!')
   config = get_config()
   eval_config = get_config()
   eval_config.batch_size = 1
