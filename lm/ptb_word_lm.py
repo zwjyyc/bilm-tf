@@ -509,6 +509,7 @@ def _pretrained_initializer(varname, weight_file):
     We'll stub out all the initializers in the pretrained LM with
     a function that loads the weights from the file
     '''
+    print(varname)
     if varname == 'embedding':
       varname = 'Model/embedding:0'
     with h5py.File(weight_file, 'r') as fin:
