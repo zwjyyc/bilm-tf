@@ -340,7 +340,7 @@ class MRCConfig(object):
   lr_decay = 0.5
   batch_size = 20
   vocab_size = 299372
-  rnn_mode = GRU
+  rnn_mode = BASIC
 
 
 
@@ -358,7 +358,7 @@ class TestConfig(object):
   lr_decay = 0.5
   batch_size = 20
   vocab_size = 299372
-  rnn_mode = GRU
+  rnn_mode = BASIC
 
 
 def run_epoch(session, model, eval_op=None, verbose=False):
