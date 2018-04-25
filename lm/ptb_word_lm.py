@@ -221,7 +221,9 @@ class PTBModel(object):
       if is_training and config.keep_prob < 1:
         cell = tf.contrib.rnn.DropoutWrapper(
             cell, output_keep_prob=config.keep_prob)
+      print(cell.params())
       return cell
+
 
     cell = tf.contrib.rnn.MultiRNNCell(
         [make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
