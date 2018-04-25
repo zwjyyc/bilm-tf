@@ -96,6 +96,7 @@ FLAGS = flags.FLAGS
 BASIC = "basic"
 CUDNN = "cudnn"
 BLOCK = "block"
+GRU = "gru"
 
 
 def data_type():
@@ -208,6 +209,8 @@ class PTBModel(object):
       return tf.contrib.rnn.BasicLSTMCell(
           config.hidden_size, forget_bias=0.0, state_is_tuple=True,
           reuse=not is_training)
+    if config.rnn_mode == GRU:
+      return tf.contrib.rnn.GRUCell(num_units=config.hidden_size)
     if config.rnn_mode == BLOCK:
       return tf.contrib.rnn.LSTMBlockCell(
           config.hidden_size, forget_bias=0.0)
