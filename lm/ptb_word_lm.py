@@ -340,7 +340,7 @@ class MRCConfig(object):
   lr_decay = 0.5
   batch_size = 20
   vocab_size = 299372
-  rnn_mode = BASIC
+  rnn_mode = GRU
 
 
 
@@ -358,7 +358,7 @@ class TestConfig(object):
   lr_decay = 0.5
   batch_size = 20
   vocab_size = 299372
-  rnn_mode = BASIC
+  rnn_mode = GRU
 
 
 def run_epoch(session, model, eval_op=None, verbose=False):
@@ -413,7 +413,7 @@ def get_config():
   if FLAGS.rnn_mode:
     config.rnn_mode = FLAGS.rnn_mode
   if FLAGS.num_gpus != 1 or tf.__version__ < "1.3.0" :
-    config.rnn_mode = BASIC
+    config.rnn_mode = GRU
   return config
 
 
