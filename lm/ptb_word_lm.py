@@ -60,7 +60,6 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import json
 import time
 
 import h5py
@@ -490,6 +489,79 @@ def main(_):
         valid_perplexity, _ = run_epoch(session, mvalid)
         print("Epoch: %d Valid Perplexity: %.3f" % (i + 1, valid_perplexity))
 
+      if FLAGS.save_path:
+        print("Saving model to %s." % FLAGS.save_path)
+        sv.saver.save(session, FLAGS.save_path, global_step=sv.global_step)
+        hdf5_file = FLAGS.save_path + '.hdf5'
+        with h5py.File(hdf5_file, 'w') as fin:
+          for k, v in paras.items():
+            fin[k] = v
+
+        with h5py.File(hdf5_file, 'r') as fout:
+          for k in paras.keys():
+            print(k)
+            print(fout[k])
+
+
+def _main(_):
+  if not FLAGS.data_path:
+    raise ValueError("Must set --data_path to PTB data directory")
+
+  os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+  os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
+
+  raw_data = reader.ptb_raw_data(FLAGS.data_path, FLAGS.vocab_path)
+  train_data, valid_data, test_data, _ = raw_data
+
+  print('data load finished!')
+  config = get_config()
+  eval_config = get_config()
+  eval_config.batch_size = 1
+  eval_config.num_steps = 1
+
+  with tf.Graph().as_default():
+    initializer = tf.random_uniform_initializer(-config.init_scale,
+                                                config.init_scale)
+
+    with tf.name_scope("Train"):
+      train_input = PTBInput(config=config, data=train_data, name="TrainInput")
+      with tf.variable_scope("Model", reuse=None, initializer=initializer):
+        m = PTBModel(is_training=True, config=config, input_=train_input)
+      tf.summary.scalar("Training Loss", m.cost)
+      tf.summary.scalar("Learning Rate", m.lr)
+
+    with tf.name_scope("Valid"):
+      valid_input = PTBInput(config=config, data=valid_data, name="ValidInput")
+      with tf.variable_scope("Model", reuse=True, initializer=initializer):
+        mvalid = PTBModel(is_training=False, config=config, input_=valid_input)
+      tf.summary.scalar("Validation Loss", mvalid.cost)
+
+    with tf.name_scope("Test"):
+      test_input = PTBInput(
+          config=eval_config, data=test_data, name="TestInput")
+      with tf.variable_scope("Model", reuse=True, initializer=initializer):
+        mtest = PTBModel(is_training=False, config=eval_config,
+                         input_=test_input)
+
+    models = {"Train": m, "Valid": mvalid, "Test": mtest}
+    for name, model in models.items():
+      model.export_ops(name)
+    metagraph = tf.train.export_meta_graph()
+    if tf.__version__ < "1.1.0" and FLAGS.num_gpus > 1:
+      raise ValueError("num_gpus > 1 is not supported for TensorFlow versions "
+                       "below 1.1.0")
+    soft_placement = False
+    if FLAGS.num_gpus > 1:
+      soft_placement = True
+      util.auto_parallel(metagraph, m)
+
+  with tf.Graph().as_default():
+    tf.train.import_meta_graph(metagraph)
+    for model in models.values():
+      model.import_ops()
+    sv = tf.train.Supervisor(logdir=FLAGS.save_path)
+    config_proto = tf.ConfigProto(allow_soft_placement=soft_placement)
+    with sv.managed_session(config=config_proto) as session:
       test_perplexity, _ = run_epoch(session, mtest)
       print("Test Perplexity: %.3f" % test_perplexity)
 
@@ -504,8 +576,6 @@ def main(_):
         with h5py.File(hdf5_file, 'r') as fout:
           for k in paras.keys():
             print(fout[k])
-
-
 
 if __name__ == "__main__":
   tf.app.run()
