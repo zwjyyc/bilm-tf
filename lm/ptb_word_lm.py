@@ -513,7 +513,7 @@ def _pretrained_initializer(varname, weight_file):
     if varname == 'embedding':
       varname = 'Model/embedding:0'
     with h5py.File(weight_file, 'r') as fin:
-        weights = fin[varname]
+        weights = fin[varname][...]
 
     def ret(shape, **kwargs):
         if list(shape) != list(weights.shape):
