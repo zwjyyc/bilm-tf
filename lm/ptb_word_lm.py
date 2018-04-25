@@ -440,7 +440,6 @@ def main(_):
   with h5py.File(hdf5_file, 'r') as fout:
     for k in fout.keys():
       print(k)
-      print(fout[k][...])
 
   return
   with tf.Graph().as_default():
