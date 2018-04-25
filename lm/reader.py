@@ -129,8 +129,4 @@ def ptb_producer(raw_data, batch_size, num_steps, name=None):
     y = tf.strided_slice(data, [0, i * num_steps + 1],
                          [batch_size, (i + 1) * num_steps + 1])
     y.set_shape([batch_size, num_steps])
-    print(x)
-    print(y)
-    print(x.shape())
-    print(y.shape())
     return x, y

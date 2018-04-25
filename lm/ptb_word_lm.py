@@ -378,9 +378,13 @@ def run_epoch(session, model, eval_op=None, verbose=False):
       feed_dict[c] = state[i].c
       feed_dict[h] = state[i].h
 
-    vals = session.run(fetches, feed_dict)
+    parameters_name = [v.name for v in tf.trainable_variables()]
+    vals, paras = session.run([fetches, parameters_name], feed_dict)
     cost = vals["cost"]
     state = vals["final_state"]
+
+    for k, v in zip(parameters_name, paras):
+      print(k, v)
 
     costs += cost
     iters += model.input.num_steps
