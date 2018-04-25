@@ -517,11 +517,6 @@ def _pretrained_initializer(varname, weight_file):
           weights = fin[varname + ':0'][...]
 
     def ret(shape, **kwargs):
-        if list(shape) != list(weights.shape):
-            raise ValueError(
-                "Invalid shape initializing {0}, got {1}, expected {2}".format(
-                    varname, shape, weights.shape)
-            )
         return weights
 
     return ret
