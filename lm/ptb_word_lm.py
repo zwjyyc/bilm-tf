@@ -438,7 +438,7 @@ def main(_):
   hdf5_file = FLAGS.save_path + '.hdf5'
 
   with h5py.File(hdf5_file, 'r') as fout:
-    for k in fout.keys():
+    for k in fout.values():
       print(k)
 
   return
