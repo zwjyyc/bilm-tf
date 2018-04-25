@@ -6,5 +6,6 @@ pick 20w sents for training; 2w sents for dev; 2w sents for test
 
 25/4/2018
 Model/embedding:0
+
 Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0
 Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0

@@ -510,11 +510,8 @@ def _pretrained_initializer(varname, weight_file):
     a function that loads the weights from the file
     '''
     print(varname)
-    if varname == 'Model/embedding':
-      print('ok')
-      varname = 'Model/embedding:0'
     with h5py.File(weight_file, 'r') as fin:
-        weights = fin[varname][...]
+        weights = fin[varname + ':0'][...]
 
     def ret(shape, **kwargs):
         if list(shape) != list(weights.shape):
