@@ -435,6 +435,14 @@ def main(_):
   eval_config.batch_size = 1
   eval_config.num_steps = 1
 
+  hdf5_file = FLAGS.save_path + '.hdf5'
+
+  with h5py.File(hdf5_file, 'r') as fout:
+    for k in fout.keys():
+      print(k)
+      print(fout[k][...])
+
+  return 
   with tf.Graph().as_default():
     initializer = tf.random_uniform_initializer(-config.init_scale,
                                                 config.init_scale)
@@ -500,8 +508,67 @@ def main(_):
         with h5py.File(hdf5_file, 'r') as fout:
           for k in paras.keys():
             print(k)
-            print(fout[k])
+            print(fout[k][...])
 
+DTYPE = 'float32'
+
+def _pretrained_initializer(varname, weight_file):
+    '''
+    We'll stub out all the initializers in the pretrained LM with
+    a function that loads the weights from the file
+    '''
+    weight_name_map = {}
+    for i in range(2):
+        for j in range(8):  # if we decide to add more layers
+            root = 'RNN_{}/RNN/MultiRNNCell/Cell{}'.format(i, j)
+            weight_name_map[root + '/rnn/lstm_cell/kernel'] = \
+                root + '/LSTMCell/W_0'
+            weight_name_map[root + '/rnn/lstm_cell/bias'] = \
+                root + '/LSTMCell/B'
+            weight_name_map[root + '/rnn/lstm_cell/projection/kernel'] = \
+                root + '/LSTMCell/W_P_0'
+
+    # convert the graph name to that in the checkpoint
+    varname_in_file = varname[5:]
+    if varname_in_file.startswith('RNN'):
+        varname_in_file = weight_name_map[varname_in_file]
+
+    if varname_in_file == 'embedding':
+        with h5py.File(weight_file, 'r') as fin:
+            # Have added a special 0 index for padding not present
+            # in the original model.
+            embed_weights = fin[varname_in_file][...]
+            weights = np.zeros(
+                (embed_weights.shape[0] + 1, embed_weights.shape[1]),
+                dtype=DTYPE
+            )
+            weights[1:, :] = embed_weights
+    else:
+        with h5py.File(weight_file, 'r') as fin:
+            if varname_in_file == 'char_embed':
+                # Have added a special 0 index for padding not present
+                # in the original model.
+                char_embed_weights = fin[varname_in_file][...]
+                weights = np.zeros(
+                    (char_embed_weights.shape[0] + 1,
+                     char_embed_weights.shape[1]),
+                    dtype=DTYPE
+                )
+                weights[1:, :] = char_embed_weights
+            else:
+                weights = fin[varname_in_file][...]
+
+    # Tensorflow initializers are callables that accept a shape parameter
+    # and some optional kwargs
+    def ret(shape, **kwargs):
+        if list(shape) != list(weights.shape):
+            raise ValueError(
+                "Invalid shape initializing {0}, got {1}, expected {2}".format(
+                    varname_in_file, shape, weights.shape)
+            )
+        return weights
+
+    return ret
 
 def _main(_):
   if not FLAGS.data_path:
@@ -509,6 +576,8 @@ def _main(_):
 
   os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
   os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
+
+  hdf5_file = FLAGS.save_path + '.hdf5'
 
   raw_data = reader.ptb_raw_data(FLAGS.data_path, FLAGS.vocab_path)
   train_data, valid_data, test_data, _ = raw_data
@@ -519,13 +588,20 @@ def _main(_):
   eval_config.batch_size = 1
   eval_config.num_steps = 1
 
+  def custom_getter(getter, name, *args, **kwargs):
+    kwargs['trainable'] = False
+    kwargs['initializer'] = _pretrained_initializer(
+      name, hdf5_file)
+    return getter(name, *args, **kwargs)
+
   with tf.Graph().as_default():
     initializer = tf.random_uniform_initializer(-config.init_scale,
                                                 config.init_scale)
 
+
     with tf.name_scope("Train"):
       train_input = PTBInput(config=config, data=train_data, name="TrainInput")
-      with tf.variable_scope("Model", reuse=None, initializer=initializer):
+      with tf.variable_scope("Model", reuse=None, initializer=initializer, custom_getter=custom_getter):
         m = PTBModel(is_training=True, config=config, input_=train_input)
       tf.summary.scalar("Training Loss", m.cost)
       tf.summary.scalar("Learning Rate", m.lr)
@@ -562,20 +638,9 @@ def _main(_):
     sv = tf.train.Supervisor(logdir=FLAGS.save_path)
     config_proto = tf.ConfigProto(allow_soft_placement=soft_placement)
     with sv.managed_session(config=config_proto) as session:
-      test_perplexity, _ = run_epoch(session, mtest)
-      print("Test Perplexity: %.3f" % test_perplexity)
+      valid_perplexity, _ = run_epoch(session, mvalid)
+      print("Valid Perplexity: %.3f" % valid_perplexity)
 
-      if FLAGS.save_path:
-        print("Saving model to %s." % FLAGS.save_path)
-        sv.saver.save(session, FLAGS.save_path, global_step=sv.global_step)
-        hdf5_file = FLAGS.save_path + '.hdf5'
-        with h5py.File(hdf5_file, 'w') as fin:
-          for k, v in paras.items():
-            fin[k] = v
-
-        with h5py.File(hdf5_file, 'r') as fout:
-          for k in paras.keys():
-            print(fout[k])
 
 if __name__ == "__main__":
   tf.app.run()
