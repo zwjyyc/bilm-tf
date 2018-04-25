@@ -9,3 +9,12 @@ Model/embedding:0
 
 Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0
 Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0
+
+Model/embedding
+Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel
+Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias
+Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel
+Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias
+Model/softmax_w
+Model/softmax_b
+Model/global_step
