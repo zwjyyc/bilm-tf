@@ -435,13 +435,6 @@ def main(_):
   eval_config.batch_size = 1
   eval_config.num_steps = 1
 
-  hdf5_file = FLAGS.save_path + '.hdf5'
-
-  with h5py.File(hdf5_file, 'r') as fout:
-    for k in fout.values():
-      print(k)
-
-  return
   with tf.Graph().as_default():
     initializer = tf.random_uniform_initializer(-config.init_scale,
                                                 config.init_scale)
@@ -516,54 +509,14 @@ def _pretrained_initializer(varname, weight_file):
     We'll stub out all the initializers in the pretrained LM with
     a function that loads the weights from the file
     '''
-    weight_name_map = {}
-    for i in range(2):
-        for j in range(8):  # if we decide to add more layers
-            root = 'RNN_{}/RNN/MultiRNNCell/Cell{}'.format(i, j)
-            weight_name_map[root + '/rnn/lstm_cell/kernel'] = \
-                root + '/LSTMCell/W_0'
-            weight_name_map[root + '/rnn/lstm_cell/bias'] = \
-                root + '/LSTMCell/B'
-            weight_name_map[root + '/rnn/lstm_cell/projection/kernel'] = \
-                root + '/LSTMCell/W_P_0'
-
-    # convert the graph name to that in the checkpoint
-    varname_in_file = varname[5:]
-    if varname_in_file.startswith('RNN'):
-        varname_in_file = weight_name_map[varname_in_file]
-
-    if varname_in_file == 'embedding':
-        with h5py.File(weight_file, 'r') as fin:
-            # Have added a special 0 index for padding not present
-            # in the original model.
-            embed_weights = fin[varname_in_file][...]
-            weights = np.zeros(
-                (embed_weights.shape[0] + 1, embed_weights.shape[1]),
-                dtype=DTYPE
-            )
-            weights[1:, :] = embed_weights
-    else:
-        with h5py.File(weight_file, 'r') as fin:
-            if varname_in_file == 'char_embed':
-                # Have added a special 0 index for padding not present
-                # in the original model.
-                char_embed_weights = fin[varname_in_file][...]
-                weights = np.zeros(
-                    (char_embed_weights.shape[0] + 1,
-                     char_embed_weights.shape[1]),
-                    dtype=DTYPE
-                )
-                weights[1:, :] = char_embed_weights
-            else:
-                weights = fin[varname_in_file][...]
-
-    # Tensorflow initializers are callables that accept a shape parameter
-    # and some optional kwargs
+    with h5py.File(weight_file, 'r') as fin:
+        weights = fin[varname]
+        
     def ret(shape, **kwargs):
         if list(shape) != list(weights.shape):
             raise ValueError(
                 "Invalid shape initializing {0}, got {1}, expected {2}".format(
-                    varname_in_file, shape, weights.shape)
+                    varname, shape, weights.shape)
             )
         return weights
 
