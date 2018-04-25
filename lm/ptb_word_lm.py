@@ -52,7 +52,7 @@ $ tar xvf simple-examples.tgz
 
 To run:
 
-$ python ptb_word_lm.py --data_path=data/corpus/ --vocab_path= ../../Baidu/data/vocab_cut10_true_newpl122gEmb/vocab.data
+$  python ptb_word_lm.py --data_path=../data/corpus/ --vocab_path=../../Baidu/data/vocab_cut10_true_newpl122gEmb/vocab.data --save_path=../models/lm_parameters
 
 """
 from __future__ import absolute_import
@@ -60,8 +60,10 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import json
 import time
 
+import h5py
 import numpy as np
 import tensorflow as tf
 
@@ -334,8 +336,8 @@ class MRCConfig(object):
   num_layers = 2
   num_steps = 150
   hidden_size = 156
-  max_epoch = 4
-  max_max_epoch = 4
+  max_epoch = 1
+  max_max_epoch = 1
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
@@ -382,12 +384,13 @@ def run_epoch(session, model, eval_op=None, verbose=False):
       feed_dict[h] = state[i].h
 
     parameters_name = [v.name for v in tf.trainable_variables()]
-    vals, paras = session.run([fetches, parameters_name], feed_dict)
+    vals, parameters_values = session.run([fetches, parameters_name], feed_dict)
     cost = vals["cost"]
     state = vals["final_state"]
 
-    for k, v in zip(parameters_name, paras):
-      print(k, v)
+    paras = {}
+    for k, v in zip(parameters_name, parameters_values):
+      paras[k] = v
 
     costs += cost
     iters += model.input.num_steps
@@ -398,7 +401,7 @@ def run_epoch(session, model, eval_op=None, verbose=False):
              iters * model.input.batch_size * max(1, FLAGS.num_gpus) /
              (time.time() - start_time)))
 
-  return np.exp(costs / iters)
+  return np.exp(costs / iters), paras
 
 
 def get_config():
@@ -481,18 +484,27 @@ def main(_):
         m.assign_lr(session, config.learning_rate * lr_decay)
 
         print("Epoch: %d Learning rate: %.3f" % (i + 1, session.run(m.lr)))
-        train_perplexity = run_epoch(session, m, eval_op=m.train_op,
+        train_perplexity, paras = run_epoch(session, m, eval_op=m.train_op,
                                      verbose=True)
         print("Epoch: %d Train Perplexity: %.3f" % (i + 1, train_perplexity))
-        valid_perplexity = run_epoch(session, mvalid)
+        valid_perplexity, _ = run_epoch(session, mvalid)
         print("Epoch: %d Valid Perplexity: %.3f" % (i + 1, valid_perplexity))
 
-      test_perplexity = run_epoch(session, mtest)
+      test_perplexity, _ = run_epoch(session, mtest)
       print("Test Perplexity: %.3f" % test_perplexity)
 
       if FLAGS.save_path:
         print("Saving model to %s." % FLAGS.save_path)
         sv.saver.save(session, FLAGS.save_path, global_step=sv.global_step)
+        hdf5_file = FLAGS.save_path + '.hdf5'
+        with h5py.File(hdf5_file, 'w') as fin:
+          for k, v in paras.items():
+            fin[k] = v
+
+        with h5py.File(hdf5_file, 'r') as fout:
+          for k in paras.keys():
+            print(fout[k])
+
 
 
 if __name__ == "__main__":
