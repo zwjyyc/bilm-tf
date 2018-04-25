@@ -442,7 +442,7 @@ def main(_):
       print(k)
       print(fout[k][...])
 
-  return 
+  return
   with tf.Graph().as_default():
     initializer = tf.random_uniform_initializer(-config.init_scale,
                                                 config.init_scale)
