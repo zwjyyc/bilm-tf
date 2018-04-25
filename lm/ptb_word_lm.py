@@ -186,11 +186,13 @@ class PTBModel(object):
         input_size=config.hidden_size,
         dropout=1 - config.keep_prob if is_training else 0)
     params_size_t = self._cell.params_size()
+    print(params_size_t)
     self._rnn_params = tf.get_variable(
         "lstm_params",
         initializer=tf.random_uniform(
             [params_size_t], -config.init_scale, config.init_scale),
         validate_shape=False)
+
     c = tf.zeros([config.num_layers, self.batch_size, config.hidden_size],
                  tf.float32)
     h = tf.zeros([config.num_layers, self.batch_size, config.hidden_size],
@@ -221,8 +223,6 @@ class PTBModel(object):
       if is_training and config.keep_prob < 1:
         cell = tf.contrib.rnn.DropoutWrapper(
             cell, output_keep_prob=config.keep_prob)
-      print(cell.variables)
-      print(cell.weights)
       return cell
 
 
