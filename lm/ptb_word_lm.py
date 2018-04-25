@@ -221,7 +221,8 @@ class PTBModel(object):
       if is_training and config.keep_prob < 1:
         cell = tf.contrib.rnn.DropoutWrapper(
             cell, output_keep_prob=config.keep_prob)
-      print(cell.params())
+      print(cell.variables)
+      print(cell.weights)
       return cell
 
 
