@@ -167,7 +167,7 @@ class PTBModel(object):
     optimizer = tf.train.GradientDescentOptimizer(self._lr)
     self._train_op = optimizer.apply_gradients(
         zip(grads, tvars),
-        global_step=tf.Variable(1, trainable=False, name='global_step', dtype=tf.int32))
+        global_step=tf.train.get_or_create_global_step())
 
     self._new_lr = tf.placeholder(
         tf.float32, shape=[], name="new_learning_rate")
@@ -382,7 +382,7 @@ def run_epoch(session, model, eval_op=None, verbose=False):
       feed_dict[c] = state[i].c
       feed_dict[h] = state[i].h
 
-    parameters_name = [v.name for v in tf.trainable_variables()]
+    parameters_name = [v.name for v in tf.Variable()]
     vals, parameters_values = session.run([fetches, parameters_name], feed_dict)
     cost = vals["cost"]
     state = vals["final_state"]
@@ -419,7 +419,7 @@ def get_config():
   return config
 
 
-def _main(_):
+def main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
@@ -521,7 +521,7 @@ def _pretrained_initializer(varname, weight_file):
 
     return ret
 
-def main(_):
+def _main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
