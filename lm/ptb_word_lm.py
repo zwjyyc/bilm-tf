@@ -563,8 +563,8 @@ def main(_):
         data_dict['softmax_b'] = fin['Model/softmax_b:0']
         for param_name, data in data_dict.iteritems():
           try:
-            var = tf.get_variable(param_name, custom_getter=custom_getter)
-            var.assign(data)
+            var = tf.get_variable(param_name)
+            var.assign(tf.convert_to_tensor(data))
           except ValueError:
             raise
       tf.summary.scalar("Training Loss", m.cost)
