@@ -420,7 +420,7 @@ def get_config():
   return config
 
 
-def _main(_):
+def main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
@@ -522,7 +522,7 @@ def _pretrained_initializer(varname, weight_file):
 
     return ret
 
-def main(_):
+def _main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
