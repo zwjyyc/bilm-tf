@@ -512,7 +512,7 @@ def _pretrained_initializer(varname, weight_file):
     print(varname)
     with h5py.File(weight_file, 'r') as fin:
         if varname == 'Model/global_step':
-          weights = 10
+          weights = tf.Variable(1, trainable=False, name='global_step')
         else:
           weights = fin[varname + ':0'][...]
 
