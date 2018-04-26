@@ -586,15 +586,15 @@ def main(_):
       model.import_ops()
     sv = tf.train.Supervisor(logdir=FLAGS.save_path)
     config_proto = tf.ConfigProto(allow_soft_placement=soft_placement)
-    with sv.managed_session(config=config_proto) as session, h5py.File(hdf5_file, 'r') as fin, tf.variable_scope("Model", reuse=True):
+    with sv.managed_session(config=config_proto) as session, h5py.File(hdf5_file, 'r') as fin, tf.variable_scope("Model", reuse=tf.AUTO_REUSE):
       data_dict = {}
-      data_dict['Model/embedding'] = fin['Model/embedding:0']
-      data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
-      data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
-      data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
-      data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
-      data_dict['Model/softmax_w'] = fin['Model/softmax_w:0']
-      data_dict['Model/softmax_b'] = fin['Model/softmax_b:0']
+      data_dict['embedding'] = fin['Model/embedding:0']
+      data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
+      data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
+      data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
+      data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
+      data_dict['softmax_w'] = fin['Model/softmax_w:0']
+      data_dict['softmax_b'] = fin['Model/softmax_b:0']
       for param_name, data in data_dict.iteritems():
         try:
           var = tf.get_variable(param_name)
