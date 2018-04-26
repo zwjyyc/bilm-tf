@@ -553,7 +553,7 @@ def main(_):
       tf.summary.scalar("Training Loss", m.cost)
       tf.summary.scalar("Learning Rate", m.lr)
 
-    with h5py.File(hdf5_file, 'r') as fin:
+    with tf.variable_scope("Model", reuse=tf.AUTO_REUSE), h5py.File(hdf5_file, 'r') as fin:
       data_dict = {}
       data_dict['Model/embedding'] = fin['Model/embedding:0']
       data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin[
@@ -572,6 +572,7 @@ def main(_):
           var.assign(tf.convert_to_tensor(data[...]))
         except ValueError:
           raise
+
     with tf.name_scope("Valid"):
       valid_input = PTBInput(config=config, data=valid_data, name="ValidInput")
       with tf.variable_scope("Model", reuse=True, initializer=initializer):
