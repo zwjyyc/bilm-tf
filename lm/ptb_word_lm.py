@@ -564,7 +564,7 @@ def main(_):
         for param_name, data in data_dict.iteritems():
           try:
             var = tf.get_variable(param_name, custom_getter=custom_getter)
-            print(var)
+            var.assign(data)
           except ValueError:
             raise
       tf.summary.scalar("Training Loss", m.cost)
