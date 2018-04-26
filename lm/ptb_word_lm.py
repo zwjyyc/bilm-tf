@@ -165,8 +165,8 @@ class PTBModel(object):
     grads, _ = tf.clip_by_global_norm(tf.gradients(self._cost, tvars),
                                       config.max_grad_norm)
     optimizer = tf.train.GradientDescentOptimizer(self._lr)
-    self._train_op = optimizer.apply_gradients(
-        zip(grads, tvars)) #,
+    #self._train_op = optimizer.apply_gradients(
+     #   zip(grads, tvars)) #,
         #global_step=tf.train.get_or_create_global_step())
 
     self._new_lr = tf.placeholder(
