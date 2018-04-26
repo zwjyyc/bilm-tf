@@ -595,6 +595,7 @@ def main(_):
       data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
       data_dict['Model/softmax_w'] = fin['Model/softmax_w:0']
       data_dict['Model/softmax_b'] = fin['Model/softmax_b:0']
+      tf.get_variable_scope().reuse_variables()
       for param_name, data in data_dict.iteritems():
         try:
           var = tf.get_variable(param_name)
