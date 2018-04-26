@@ -564,7 +564,7 @@ def main(_):
         for param_name, data in data_dict.iteritems():
           try:
             var = tf.get_variable(param_name)
-            var.assign(tf.convert_to_tensor(data))
+            var.assign(tf.convert_to_tensor(data[...]))
           except ValueError:
             raise
       tf.summary.scalar("Training Loss", m.cost)
