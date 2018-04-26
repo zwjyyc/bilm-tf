@@ -550,8 +550,26 @@ def main(_):
 
     with tf.name_scope("Train"):
       train_input = PTBInput(config=config, data=train_data, name="TrainInput")
-      with tf.variable_scope("Model", reuse=None, initializer=initializer):
+      with tf.variable_scope("Model", reuse=None, initializer=initializer), h5py.File(hdf5_file, 'r') as fin:
         m = PTBModel(is_training=True, config=config, input_=train_input)
+        data_dict = {}
+        data_dict['embedding'] = fin['Model/embedding:0']
+        data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin[
+          'Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
+        data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin[
+          'Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
+        data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin[
+          'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
+        data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin[
+          'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
+        data_dict['softmax_w'] = fin['Model/softmax_w:0']
+        data_dict['softmax_b'] = fin['Model/softmax_b:0']
+        for param_name, data in data_dict.iteritems():
+          try:
+            var = tf.get_variable(param_name)
+            print(var)
+          except ValueError:
+            raise
       tf.summary.scalar("Training Loss", m.cost)
       tf.summary.scalar("Learning Rate", m.lr)
 
@@ -586,21 +604,7 @@ def main(_):
       model.import_ops()
     sv = tf.train.Supervisor(logdir=FLAGS.save_path)
     config_proto = tf.ConfigProto(allow_soft_placement=soft_placement)
-    with sv.managed_session(config=config_proto) as session, h5py.File(hdf5_file, 'r') as fin, tf.variable_scope("Model", reuse=tf.AUTO_REUSE):
-      data_dict = {}
-      data_dict['embedding'] = fin['Model/embedding:0']
-      data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
-      data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
-      data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
-      data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
-      data_dict['softmax_w'] = fin['Model/softmax_w:0']
-      data_dict['softmax_b'] = fin['Model/softmax_b:0']
-      for param_name, data in data_dict.iteritems():
-        try:
-          var = tf.get_variable(param_name)
-          session.run(var.assign(data))
-        except ValueError:
-            raise
+    with sv.managed_session(config=config_proto) as session:
       valid_perplexity, _ = run_epoch(session, mvalid)
       print("Valid Perplexity: %.3f" % valid_perplexity)
 
