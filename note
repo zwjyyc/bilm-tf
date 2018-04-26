@@ -32,7 +32,6 @@ Traceback (most recent call last):
     raise ValueError("No variables provided.")
 ValueError: No variables provided.
 yyc@dlib-T630:/home1/yyc/Code/bilm-tf/lm$
+
 Broadcast message from root@dlib-T630 on pts/45 (Wed 2018-04-25 22:57:55 +08):
-
 The system is going down for poweroff at Wed 2018-04-25 22:58:55 +08!
-

@@ -382,7 +382,8 @@ def run_epoch(session, model, eval_op=None, verbose=False):
       feed_dict[c] = state[i].c
       feed_dict[h] = state[i].h
 
-    parameters_name = [v.name for v in tf.Variable()]
+    parameters_name = [v.name for v in tf.trainable_variable()]
+    parameters_name.append('Model/global_step')
     vals, parameters_values = session.run([fetches, parameters_name], feed_dict)
     cost = vals["cost"]
     state = vals["final_state"]
@@ -419,7 +420,7 @@ def get_config():
   return config
 
 
-def main(_):
+def _main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
@@ -511,17 +512,17 @@ def _pretrained_initializer(varname, weight_file):
     '''
     print(varname)
     with h5py.File(weight_file, 'r') as fin:
-        if varname == 'Model/global_step':
-          weights = tf.Variable(1, trainable=False, name='global_step', dtype=tf.int64)
-        else:
-          weights = fin[varname + ':0'][...]
+      if varname == 'Model/global_step':
+        weights = tf.get_variable('Model/global_step', )
+      else:
+        weights = fin[varname + ':0'][...]
 
     def ret(shape, **kwargs):
         return weights
 
     return ret
 
-def _main(_):
+def main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
