@@ -335,8 +335,8 @@ class MRCConfig(object):
   num_layers = 2
   num_steps = 150
   hidden_size = 156
-  max_epoch = 20
-  max_max_epoch = 25
+  max_epoch = 1
+  max_max_epoch = 1
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
@@ -419,7 +419,7 @@ def get_config():
   return config
 
 
-def _main(_):
+def main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
@@ -517,7 +517,7 @@ def _pretrained_initializer(varname, weight_file):
 
     return ret
 
-def main(_):
+def _main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
