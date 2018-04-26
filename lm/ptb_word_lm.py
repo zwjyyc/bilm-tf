@@ -580,7 +580,6 @@ def main(_):
       soft_placement = True
       util.auto_parallel(metagraph, m)
 
-
   with tf.Graph().as_default():
     tf.train.import_meta_graph(metagraph)
     for model in models.values():
@@ -590,7 +589,7 @@ def main(_):
     with sv.managed_session(config=config_proto) as session, h5py.File(hdf5_file, 'r') as fin:
       data_dict = {}
       data_dict['Model/embedding'] = fin['Model/embedding:0']
-      data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel']
+      data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
       data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
       data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
       data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
