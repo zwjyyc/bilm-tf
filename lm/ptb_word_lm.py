@@ -382,7 +382,7 @@ def run_epoch(session, model, eval_op=None, verbose=False):
       feed_dict[c] = state[i].c
       feed_dict[h] = state[i].h
 
-    parameters_name = [v.name for v in tf.trainable_variable()]
+    parameters_name = [v.name for v in tf.trainable_variables()]
     parameters_name.append('Model/global_step')
     vals, parameters_values = session.run([fetches, parameters_name], feed_dict)
     cost = vals["cost"]
