@@ -561,7 +561,6 @@ def main(_):
           'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
         data_dict['softmax_w'] = fin['Model/softmax_w:0']
         data_dict['softmax_b'] = fin['Model/softmax_b:0']
-        tf.get_variable('iii')
         for param_name, data in data_dict.iteritems():
           try:
             var = tf.get_variable(param_name)
