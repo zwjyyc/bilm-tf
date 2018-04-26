@@ -383,7 +383,6 @@ def run_epoch(session, model, eval_op=None, verbose=False):
       feed_dict[h] = state[i].h
 
     parameters_name = [v.name for v in tf.global_variables()]
-    print(parameters_name)
     vals, parameters_values = session.run([fetches, parameters_name], feed_dict)
     cost = vals["cost"]
     state = vals["final_state"]
