@@ -241,15 +241,15 @@ class PTBModel(object):
     #
     # The alternative version of the code below is:
     #
-    # inputs = tf.unstack(inputs, num=num_steps, axis=1)
-    # outputs, state = tf.contrib.rnn.static_rnn(cell, inputs,
-    #                            initial_state=self._initial_state)
-    outputs = []
-    with tf.variable_scope("RNN"):
-      for time_step in range(self.num_steps):
-        if time_step > 0: tf.get_variable_scope().reuse_variables()
-        (cell_output, state) = cell(inputs[:, time_step, :], state)
-        outputs.append(cell_output)
+    inputs = tf.unstack(inputs, num=self.num_steps, axis=1)
+    outputs, state = tf.contrib.rnn.static_rnn(cell, inputs,
+                                initial_state=self._initial_state)
+    #outputs = []
+    #with tf.variable_scope("RNN"):
+    #  for time_step in range(self.num_steps):
+    #    if time_step > 0: tf.get_variable_scope().reuse_variables()
+    #    (cell_output, state) = cell(inputs[:, time_step, :], state)
+    #    outputs.append(cell_output)
     output = tf.reshape(tf.concat(outputs, 1), [-1, config.hidden_size])
     return output, state
 
@@ -497,9 +497,9 @@ def main(_):
           for k, v in paras.items():
             fin[k] = v
 
-        #with h5py.File(hdf5_file, 'r') as fout:
-        #  for k in paras.keys():
-        #    print(k)
+        with h5py.File(hdf5_file, 'r') as fout:
+          for k in paras.keys():
+            print(k)
         #    print(fout[k][...])
 
 DTYPE = 'float32'
