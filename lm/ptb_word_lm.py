@@ -335,8 +335,8 @@ class MRCConfig(object):
   num_layers = 2
   num_steps = 150
   hidden_size = 156
-  max_epoch = 1
-  max_max_epoch = 1
+  max_epoch = 25
+  max_max_epoch = 30
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
