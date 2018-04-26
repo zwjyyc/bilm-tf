@@ -547,7 +547,7 @@ def main(_):
 
     with tf.name_scope("Train"):
       train_input = PTBInput(config=config, data=train_data, name="TrainInput")
-      with tf.variable_scope("Model", reuse=tf.AUTO_REUSE, initializer=initializer), h5py.File(hdf5_file, 'r') as fin:
+      with tf.variable_scope("Model", reuse=None, initializer=initializer), h5py.File(hdf5_file, 'r') as fin:
         m = PTBModel(is_training=True, config=config, input_=train_input)
         data_dict = {}
         data_dict['embedding'] = fin['Model/embedding:0']
