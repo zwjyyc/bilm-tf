@@ -274,7 +274,7 @@ class PTBModel(object):
   def import_ops(self):
     """Imports ops from collections."""
     if self._is_training:
-      self._train_op = tf.get_collection_ref("train_op")[0]
+      #self._train_op = tf.get_collection_ref("train_op")[0]
       self._lr = tf.get_collection_ref("lr")[0]
       self._new_lr = tf.get_collection_ref("new_lr")[0]
       self._lr_update = tf.get_collection_ref("lr_update")[0]
