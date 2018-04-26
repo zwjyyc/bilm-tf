@@ -167,7 +167,7 @@ class PTBModel(object):
     optimizer = tf.train.GradientDescentOptimizer(self._lr)
     self._train_op = optimizer.apply_gradients(
         zip(grads, tvars),
-        global_step=tf.train.get_or_create_global_step())
+        global_step=tf.Variable(1, trainable=False, name='global_step', dtype=tf.int64))
 
     self._new_lr = tf.placeholder(
         tf.float32, shape=[], name="new_learning_rate")
