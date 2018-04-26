@@ -511,10 +511,7 @@ def _pretrained_initializer(varname, weight_file):
     '''
     print(varname)
     with h5py.File(weight_file, 'r') as fin:
-
         weights = fin[varname + ':0'][...]
-        if varname == 'Model/global_step':
-          weights = tf.Variable(weights)
     def ret(shape, **kwargs):
         return weights
 
@@ -566,8 +563,7 @@ def main(_):
         data_dict['softmax_b'] = fin['Model/softmax_b:0']
         for param_name, data in data_dict.iteritems():
           try:
-            var = tf.get_variable(param_name)
-            var.assign(data)
+            var = tf.get_variable(param_name, custom_getter=custom_getter)
             print(var)
           except ValueError:
             raise
