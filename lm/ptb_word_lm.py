@@ -547,29 +547,31 @@ def main(_):
 
     with tf.name_scope("Train"):
       train_input = PTBInput(config=config, data=train_data, name="TrainInput")
-      with tf.variable_scope("Model", reuse=None, initializer=initializer), h5py.File(hdf5_file, 'r') as fin:
+      with tf.variable_scope("Model", reuse=None, initializer=initializer):
         m = PTBModel(is_training=True, config=config, input_=train_input)
-        data_dict = {}
-        data_dict['embedding'] = fin['Model/embedding:0']
-        data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin[
-          'Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
-        data_dict['RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin[
-          'Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
-        data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin[
-          'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
-        data_dict['RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin[
-          'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
-        data_dict['softmax_w'] = fin['Model/softmax_w:0']
-        data_dict['softmax_b'] = fin['Model/softmax_b:0']
-        for param_name, data in data_dict.iteritems():
-          try:
-            var = tf.get_variable(param_name)
-            var.assign(tf.convert_to_tensor(data[...]))
-          except ValueError:
-            raise
+
       tf.summary.scalar("Training Loss", m.cost)
       tf.summary.scalar("Learning Rate", m.lr)
 
+    with h5py.File(hdf5_file, 'r') as fin:
+      data_dict = {}
+      data_dict['Model/embedding'] = fin['Model/embedding:0']
+      data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] = fin[
+        'Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/kernel:0']
+      data_dict['Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias'] = fin[
+        'Model/RNN/multi_rnn_cell/cell_0/basic_lstm_cell/bias:0']
+      data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel'] = fin[
+        'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/kernel:0']
+      data_dict['Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias'] = fin[
+        'Model/RNN/multi_rnn_cell/cell_1/basic_lstm_cell/bias:0']
+      data_dict['Model/softmax_w'] = fin['Model/softmax_w:0']
+      data_dict['Model/softmax_b'] = fin['Model/softmax_b:0']
+      for param_name, data in data_dict.iteritems():
+        try:
+          var = tf.get_variable(param_name)
+          var.assign(tf.convert_to_tensor(data[...]))
+        except ValueError:
+          raise
     with tf.name_scope("Valid"):
       valid_input = PTBInput(config=config, data=valid_data, name="ValidInput")
       with tf.variable_scope("Model", reuse=True, initializer=initializer):
