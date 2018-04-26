@@ -165,9 +165,9 @@ class PTBModel(object):
     grads, _ = tf.clip_by_global_norm(tf.gradients(self._cost, tvars),
                                       config.max_grad_norm)
     optimizer = tf.train.GradientDescentOptimizer(self._lr)
-    #self._train_op = optimizer.apply_gradients(
-     #   zip(grads, tvars)) #,
-        #global_step=tf.train.get_or_create_global_step())
+    self._train_op = optimizer.apply_gradients(
+        zip(grads, tvars),
+        global_step=tf.train.get_or_create_global_step())
 
     self._new_lr = tf.placeholder(
         tf.float32, shape=[], name="new_learning_rate")
@@ -274,7 +274,7 @@ class PTBModel(object):
   def import_ops(self):
     """Imports ops from collections."""
     if self._is_training:
-      #self._train_op = tf.get_collection_ref("train_op")[0]
+      self._train_op = tf.get_collection_ref("train_op")[0]
       self._lr = tf.get_collection_ref("lr")[0]
       self._new_lr = tf.get_collection_ref("new_lr")[0]
       self._lr_update = tf.get_collection_ref("lr_update")[0]
@@ -335,8 +335,8 @@ class MRCConfig(object):
   num_layers = 2
   num_steps = 150
   hidden_size = 156
-  max_epoch = 1
-  max_max_epoch = 1
+  max_epoch = 5
+  max_max_epoch = 5
   keep_prob = 1.0
   lr_decay = 0.5
   batch_size = 20
@@ -419,7 +419,7 @@ def get_config():
   return config
 
 
-def _main(_):
+def main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
@@ -520,7 +520,7 @@ def _pretrained_initializer(varname, weight_file):
 
     return ret
 
-def main(_):
+def _main(_):
   if not FLAGS.data_path:
     raise ValueError("Must set --data_path to PTB data directory")
 
