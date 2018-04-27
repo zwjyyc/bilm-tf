@@ -334,7 +334,7 @@ class MRCConfig(object):
   max_grad_norm = 5
   num_layers = 2
   num_steps = 150
-  hidden_size = 156
+  hidden_size = 96
   max_epoch = 25
   max_max_epoch = 30
   keep_prob = 1.0
