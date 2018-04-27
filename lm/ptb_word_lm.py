@@ -489,17 +489,17 @@ def main(_):
         valid_perplexity, _ = run_epoch(session, mvalid)
         print("Epoch: %d Valid Perplexity: %.3f" % (i + 1, valid_perplexity))
 
-      if FLAGS.save_path:
-        print("Saving model to %s." % FLAGS.save_path)
-        sv.saver.save(session, FLAGS.save_path, global_step=sv.global_step)
-        hdf5_file = FLAGS.save_path + '.hdf5'
-        with h5py.File(hdf5_file, 'w') as fin:
-          for k, v in paras.items():
-            fin[k] = v
+        if FLAGS.save_path:
+          print("Saving model to %s." % FLAGS.save_path)
+          sv.saver.save(session, FLAGS.save_path, global_step=sv.global_step)
+          hdf5_file = FLAGS.save_path + '.hdf5'
+          with h5py.File(hdf5_file, 'w') as fin:
+            for k, v in paras.items():
+              fin[k] = v
 
-        with h5py.File(hdf5_file, 'r') as fout:
-          for k in paras.keys():
-            print(k)
+          with h5py.File(hdf5_file, 'r') as fout:
+            for k in paras.keys():
+              print(k)
         #    print(fout[k][...])
 
 DTYPE = 'float32'
